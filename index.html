@@ -112,12 +112,17 @@
       var principalData = [];
       
       // Perform calculations
-      while (borrowedMoney > 0 and totalMonths <= 360) {
+      while (borrowedMoney > 0) {
         // Calculate monthly interest payment
         var monthlyInterestPayment = borrowedMoney * monthlyInterestRate;
         
         // Calculate remaining amount after interest payment
         var remainingAmount = borrowedMoney - (monthlyPayments - monthlyInterestPayment);
+        
+        if (remainingAmount >= borrowedMoney) {
+          alert("Your monthly payment is too low to pay off the loan. Please increase your monthly payment.");
+          return;
+        }
         
         // Update total interest paid and principal paid
         totalInterest += monthlyInterestPayment;
