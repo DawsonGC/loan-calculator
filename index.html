@@ -112,7 +112,7 @@
       var principalData = [];
       
       // Perform calculations
-      while (borrowedMoney > 0) {
+      while (borrowedMoney > 0 and totalMonths <= 360) {
         // Calculate monthly interest payment
         var monthlyInterestPayment = borrowedMoney * monthlyInterestRate;
         
