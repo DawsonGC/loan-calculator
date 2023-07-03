@@ -120,7 +120,8 @@
         var remainingAmount = borrowedMoney - (monthlyPayments - monthlyInterestPayment);
         
         if (remainingAmount >= borrowedMoney) {
-          alert("Your monthly payment is too low to pay off the loan. Please increase your monthly payment.");
+          var minPayment = formatCurrency(monthlyInterestPayment);
+          alert("Your monthly payment is too low to pay off the loan. The minimum monthly payment to cover interest is " + minPayment + ". Please increase your monthly payment.");
           return;
         }
         
