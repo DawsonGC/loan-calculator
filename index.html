@@ -81,6 +81,13 @@
     <button id="calculateButton">Calculate</button>
   </div>
   
+  <div id="estimatedPayments">
+  <h2>Estimated Monthly Payments</h2>
+  <p>30 Year Fixed Rate: <span id="payment30yr"></span></p>
+  <p>15 Year Fixed Rate: <span id="payment15yr"></span></p>
+  <p>10 Year Fixed Rate: <span id="payment10yr"></span></p>
+  </div>
+
   <div id="results">
     <h2>Loan Summary</h2>
     <p>Total Interest Paid: <span id="totalInterest"></span></p>
@@ -221,6 +228,36 @@
     }
     
     document.getElementById('calculateButton').addEventListener('click', calculateLoan);
+
+  function updateEstimatedPayments() {
+  // Get input values
+  var borrowedMoney = parseFloat(document.getElementById('borrowedMoney').value);
+  var annualInterestRate = parseFloat(document.getElementById('annualInterestRate').value);
+
+  // Calculate monthly interest rate
+  var monthlyInterestRate = annualInterestRate / 12 / 100;
+
+  // Calculate estimated payments
+  var payment30yr = calculateMonthlyPayment(borrowedMoney, monthlyInterestRate, 30 * 12);
+  var payment15yr = calculateMonthlyPayment(borrowedMoney, monthlyInterestRate, 15 * 12);
+  var payment10yr = calculateMonthlyPayment(borrowedMoney, monthlyInterestRate, 10 * 12);
+
+  // Update the display
+  document.getElementById('payment30yr').textContent = formatCurrency(payment30yr);
+  document.getElementById('payment15yr').textContent = formatCurrency(payment15yr);
+  document.getElementById('payment10yr').textContent = formatCurrency(payment10yr);
+  }
+
+  function calculateMonthlyPayment(PV, r, n) {
+    return (r * PV) / (1 - Math.pow(1 + r, -n));
+  }
+
+  document.getElementById('borrowedMoney').addEventListener('input', updateEstimatedPayments);
+  document.getElementById('annualInterestRate').addEventListener('input', updateEstimatedPayments);
+
+  updateEstimatedPayments();
+
+
   </script>
 </body>
 </html>
