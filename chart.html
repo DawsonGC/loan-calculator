@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Loan Calculator</title>
+  <style>
+    body {
+      background-color: #F4E9E3;
+      font-family: Arial, sans-serif;
+      color: #444;
+      margin: 0;
+      padding: 20px;
+    }
+
+    h1 {
+      text-align: center;
+      color: #C5614A;
+    }
+
+    #loanForm {
+      background-color: #F9D6AD;
+      border-radius: 10px;
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 5px;
+    }
+
+    input[type="number"] {
+      padding: 8px;
+      border-radius: 5px;
+      border: none;
+      background-color: #FFF;
+      margin-bottom: 10px;
+    }
+
+    #calculateButton {
+      background-color: #C5614A;
+      color: #FFF;
+      border: none;
+      border-radius: 5px;
+      padding: 10px 20px;
+      cursor: pointer;
+    }
+
+    #calculateButton:hover {
+      background-color: #A84C34;
+    }
+
+    #results {
+      background-color: #FFF;
+      padding: 20px;
+      border-radius: 10px;
+    }
+
+    h2 {
+      color: #C5614A;
+      margin-top: 0;
+    }
+
+    #chart {
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Loan Calculator</h1>
+  
+  <div id="loanForm">
+    <label for="borrowedMoney">Borrowed Money ($):</label>
+    <input type="number" step="0.01" id="borrowedMoney" required>
+    
+    <label for="annualInterestRate">Annual Interest Rate (%):</label>
+    <input type="number" step="0.01" id="annualInterestRate" required>
+    
+    <label for="monthlyPayments">Monthly Payments ($):</label>
+    <input type="number" step="0.01" id="monthlyPayments" required>
+    
+    <button id="calculateButton">Calculate</button>
+  </div>
+  
+  <div id="results">
+    <h2>Loan Summary</h2>
+    <p>Total Interest Paid: <span id="totalInterest"></span></p>
+    <p>Total Months: <span id="totalMonths"></span></p>
+    
+    <canvas id="chart"></canvas>
+  </div>
+  
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  
+  <script>
+    // JavaScript code for calculations and chart creation
+    function calculateLoan() {
+      // Get input values
+      var borrowedMoney = parseFloat(document.getElementById('borrowedMoney').value);
+      var annualInterestRate = parseFloat(document.getElementById('annualInterestRate').value);
+      var monthlyPayments = parseFloat(document.getElementById('monthlyPayments').value);
+      
+      // Calculate monthly interest rate
+      var monthlyInterestRate = annualInterestRate / 12 / 100;
+      
+      // Initialize variables
+      var totalInterest = 0;
+      var totalMonths = 0;
+      var cumulativeInterest = 0;
+      var cumulativePrincipal = 0;
+      var labels = [];
+      var interestData = [];
+      var principalData = [];
+      
+      // Perform calculations
+      while (borrowedMoney > 0) {
+        // Calculate monthly interest payment
+        var monthlyInterestPayment = borrowedMoney * monthlyInterestRate;
+        
+        // Calculate remaining amount after interest payment
+        var remainingAmount = borrowedMoney - (monthlyPayments - monthlyInterestPayment);
+        
+        // Update total interest paid and principal paid
+        totalInterest += monthlyInterestPayment;
+        cumulativeInterest += monthlyInterestPayment;
+        cumulativePrincipal += monthlyPayments - monthlyInterestPayment;
+        
+        // Update total months
+        totalMonths++;
+        
+        // Store cumulative interest and principal data for chart
+        labels.push(totalMonths.toString());
+        interestData.push(cumulativeInterest.toFixed(2));
+        principalData.push(cumulativePrincipal.toFixed(2));
+        
+        // Update loan amount for the next iteration
+        borrowedMoney = remainingAmount;
+      }
+      
+      // Format total interest paid with commas and decimal places
+      var formattedTotalInterest = formatCurrency(totalInterest);
+      
+      // Update the results
+      document.getElementById('totalInterest').textContent = formattedTotalInterest;
+      document.getElementById('totalMonths').textContent = totalMonths;
+      
+      // Create or update the chart
+      createOrUpdateChart(labels, interestData, principalData);
+    }
+    
+    function createOrUpdateChart(labels, interestData, principalData) {
+      var chartElement = document.getElementById('chart').getContext('2d');
+      
+      if (window.myChart) {
+        // Chart already exists, update the data
+        window.myChart.data.labels = labels;
+        window.myChart.data.datasets[0].data = interestData;
+        window.myChart.data.datasets[1].data = principalData;
+        window.myChart.update();
+      } else {
+        // Create a new chart
+        window.myChart = new Chart(chartElement, {
+          type: 'line',
+          data: {
+            labels: labels,
+            datasets: [
+              {
+                label: 'Cumulative Interest Paid',
+                data: interestData,
+                backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                borderColor: 'rgba(255, 99, 132, 1)',
+                borderWidth: 2,
+                pointRadius: 2
+              },
+              {
+                label: 'Cumulative Principal Paid',
+                data: principalData,
+                backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                borderColor: 'rgba(54, 162, 235, 1)',
+                borderWidth: 2,
+                pointRadius: 2
+              }
+            ]
+          },
+          options: {
+            responsive: true,
+            scales: {
+              x: {
+                display: true,
+                title: {
+                  display: true,
+                  text: 'Month'
+                }
+              },
+              y: {
+                display: true,
+                title: {
+                  display: true,
+                  text: 'Amount ($)'
+                }
+              }
+            }
+          }
+        });
+      }
+    }
+    
+    // Helper function to format currency value with commas and decimal places
+    function formatCurrency(value) {
+      var formatter = new Intl.NumberFormat('en-US', {
+        style: 'currency',
+        currency: 'USD',
+        minimumFractionDigits: 2
+      });
+      return formatter.format(value);
+    }
+    
+    document.getElementById('calculateButton').addEventListener('click', calculateLoan);
+  </script>
+</body>
+</html>
