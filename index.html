@@ -88,6 +88,13 @@
   <p>10 Year Fixed Rate: <span id="payment10yr"></span></p>
   </div>
 
+  <div id="maxLoanAmounts">
+    <h2>Maximum Loan Amounts</h2>
+    <p>30 Year Fixed Rate: <span id="maxLoan30yr"></span></p>
+    <p>15 Year Fixed Rate: <span id="maxLoan15yr"></span></p>
+    <p>10 Year Fixed Rate: <span id="maxLoan10yr"></span></p>
+  </div>
+
   <div id="results">
     <h2>Loan Summary</h2>
     <p>Total Interest Paid: <span id="totalInterest"></span></p>
@@ -257,7 +264,37 @@
 
   updateEstimatedPayments();
 
+  // Add new function to calculate maximum loan amount
+function calculateMaxLoan() {
+  // Get input values
+  var annualInterestRate = parseFloat(document.getElementById('annualInterestRate').value);
+  var monthlyPayments = parseFloat(document.getElementById('monthlyPayments').value);
+  
+  // Calculate monthly interest rate
+  var monthlyInterestRate = annualInterestRate / 12 / 100;
 
+  // Calculate maximum loan amount for different durations
+  var maxLoan30yr = calculateLoanAmount(monthlyPayments, monthlyInterestRate, 30 * 12);
+  var maxLoan15yr = calculateLoanAmount(monthlyPayments, monthlyInterestRate, 15 * 12);
+  var maxLoan10yr = calculateLoanAmount(monthlyPayments, monthlyInterestRate, 10 * 12);
+
+  // Update the display
+  document.getElementById('maxLoan30yr').textContent = formatCurrency(maxLoan30yr);
+  document.getElementById('maxLoan15yr').textContent = formatCurrency(maxLoan15yr);
+  document.getElementById('maxLoan10yr').textContent = formatCurrency(maxLoan10yr);
+}
+
+// Function to calculate present value (loan amount)
+function calculateLoanAmount(PMT, r, n) {
+  return PMT * (1 - Math.pow(1 + r, -n)) / r;
+}
+
+// Add event listeners for 'input' events on the monthly payment and interest rate inputs
+  document.getElementById('monthlyPayments').addEventListener('input', calculateMaxLoan);
+  document.getElementById('annualInterestRate').addEventListener('input', calculateMaxLoan);
+
+  // Call function to update the display initially
+  calculateMaxLoan();
   </script>
 </body>
 </html>
