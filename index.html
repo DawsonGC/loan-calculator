@@ -95,6 +95,14 @@
     <p>10 Year Fixed Rate: <span id="maxLoan10yr"></span></p>
   </div>
 
+  <!-- Add calculate buttons in the maxLoanAmounts section -->
+  <div id="maxLoanAmounts">
+    <h2>Maximum Loan Amounts</h2>
+    <p>30 Year Fixed Rate: <span id="maxLoan30yr"></span> <button id="calculateMaxLoan30yrButton">Calculate</button></p>
+    <p>15 Year Fixed Rate: <span id="maxLoan15yr"></span> <button id="calculateMaxLoan15yrButton">Calculate</button></p>
+    <p>10 Year Fixed Rate: <span id="maxLoan10yr"></span> <button id="calculateMaxLoan10yrButton">Calculate</button></p>
+  </div>
+
   <div id="results">
     <h2>Loan Summary</h2>
     <p>Total Interest Paid: <span id="totalInterest"></span></p>
@@ -286,7 +294,7 @@ function calculateMaxLoan() {
 
 // Function to calculate present value (loan amount)
 function calculateLoanAmount(PMT, r, n) {
-  return PMT * (1 - Math.pow(1 + r, -n)) / r;
+  return Math.floor(PMT * (1 - Math.pow(1 + r, -n)) / r);
 }
 
 // Add event listeners for 'input' events on the monthly payment and interest rate inputs
@@ -295,6 +303,32 @@ function calculateLoanAmount(PMT, r, n) {
 
   // Call function to update the display initially
   calculateMaxLoan();
+
+// New function to calculate the loan based on the maximum loan amount for a specific term
+function calculateMaxLoanTerm(termYears) {
+  // Get input values
+  var borrowedMoney = parseFloat(document.getElementById('maxLoan' + termYears + 'yr').textContent.replace(/[$,]/g, ''));
+  var annualInterestRate = parseFloat(document.getElementById('annualInterestRate').value);
+  var monthlyPayments = parseFloat(document.getElementById('monthlyPayments').value);
+
+  // Check if borrowed money value is valid
+  if (isNaN(borrowedMoney)) {
+    alert("Please provide valid input values for monthly payments and annual interest rate to calculate the maximum loan amount.");
+    return;
+  }
+
+  // Update borrowed money input field
+  document.getElementById('borrowedMoney').value = borrowedMoney;
+
+  // Calculate loan
+  calculateLoan();
+}
+
+// Add event listeners for the new calculate buttons
+document.getElementById('calculateMaxLoan30yrButton').addEventListener('click', function() { calculateMaxLoanTerm(30); });
+document.getElementById('calculateMaxLoan15yrButton').addEventListener('click', function() { calculateMaxLoanTerm(15); });
+document.getElementById('calculateMaxLoan10yrButton').addEventListener('click', function() { calculateMaxLoanTerm(10); });
+
   </script>
 </body>
 </html>
